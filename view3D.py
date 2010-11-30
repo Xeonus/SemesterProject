@@ -4,6 +4,10 @@ from dendriticprofiling import correct
 from javax.vecmath import Point3f
 from ij3d import Image3DUniverse, Content
 from customnode import CustomLineMesh
+from java.awt.event import KeyListener
+
+
+#Script to visualize a list of trees defined by their unique ID
 
 def createMesh(treeID):
   tree = Display.getFront().getLayerSet().findById(treeID)
@@ -18,7 +22,7 @@ def createMesh(treeID):
 
 def visualize():
   univ = Image3DUniverse(512, 512)
-  for ID in [99442, 96580]:
+  for ID in [81196, 99431]: #trees to be visualized
     mesh = createMesh(ID)
     c = univ.createContent(mesh, str(ID))
     univ.addContent(c)

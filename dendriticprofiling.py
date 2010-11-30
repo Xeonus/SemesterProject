@@ -1,10 +1,8 @@
 #Project all nodes on to the 3 main axis
-
 from math import sqrt  
 from ini.trakem2.display import Display
 from jarray import array
 import sys
-#sys.path.append(System.getProperty("user.home") + "/Desktop/Fiji Scripts")
 sys.path.append("/Users/berthola/Desktop/Fiji Scripts")
 from matrixoperator import Matrix
 from javax.media.j3d import Transform3D
@@ -48,6 +46,7 @@ def getNodeCoordinates(tree):
     coords.append( correct([x, y, z]) )
     #print coords[len(coords)-1]
   return coords
+
 
 #-----------Get Dendritic Profiles-------------------------------------
 

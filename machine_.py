@@ -120,7 +120,7 @@ def sumDist(id1, biniter):
   sumdistance= [xdist, ydist, zdist]
   return sumdistance
 
-# Own function to reverse elements of list, because of problem with built in .reverse() commmand
+# Own function to reverse elements of a list
 def reversing(array):
   liste=array
   reverse=[]
@@ -130,46 +130,7 @@ def reversing(array):
     reverse.append(element)
   return reverse
 
-#---Compute first feature -> sum of square distance difference------------
-"""
-def feature1(id1, id2, biniter):
-  diff1=sumDist(id1, biniter)
-  diff2=sumDist(id2, biniter)
-
-  tree1 = Display.getFront().getLayerSet().findById(id1)
-  coords1 = Matrix(getNodeCoordinates(tree1))
-  m1=coords1.getRowDimension()
-
-  tree2 = Display.getFront().getLayerSet().findById(id2)
-  coords2 = Matrix(getNodeCoordinates(tree2))
-  m2=coords2.getRowDimension()
-  
-  xdiff1=diff1[0]
-  ydiff1=diff1[1]
-  zdiff1=diff1[2]
-  
-  xdiff2=diff2[0]
-  #xdiff2.reverse() #####
-  xdiff2=reversing(xdiff2)
-  ydiff2=diff2[1]
-  zdiff2=diff2[2]
-
-  xdiff=0
-  ydiff=0
-  zdiff=0
-  euclidean=[]
-
-  for i in range(0, len(xdiff1)): 
-      xdiff += sqrt((xdiff1[i]/m1-xdiff2[i]/m2)**2) #Normalize differences with number of nodes! Small trees compared to big ones give a bigger error
-      ydiff += sqrt((ydiff1[i]/m1-ydiff2[i]/m2)**2)
-      zdiff += sqrt((zdiff1[i]/m1-zdiff2[i]/m2)**2)
-
-  euclidean=[xdiff, ydiff, zdiff]
-  return euclidean
-
-
-  """
-#Correct version of feature 1
+#Correct version of feature 1: compute sum of distances in a bin
 def feature1(id1, id2, biniter):
   diff1=getDendriticProfiles(id1, biniter)
   diff2=getDendriticProfiles(id2, biniter)
@@ -198,7 +159,7 @@ def feature1(id1, id2, biniter):
   euclidean=[]
 
   for i in range(0, len(xdiff1)): 
-      xdiff += sqrt((xdiff1[i]/m1-xdiff2[i]/m2)**2) #Normalize differences with number of nodes! Small trees compared to big ones give a bigger error
+      xdiff += sqrt((xdiff1[i]/m1-xdiff2[i]/m2)**2) #Normalize differences with number of nodes!
       ydiff += sqrt((ydiff1[i]/m1-ydiff2[i]/m2)**2)
       zdiff += sqrt((zdiff1[i]/m1-zdiff2[i]/m2)**2)
       
@@ -211,6 +172,7 @@ def feature1(id1, id2, biniter):
   """  
   euclidean=[xdiff, ydiff, zdiff]
   return euclidean
+
  
 #----------Compute second feature -> Sum of Euclidean distances bincount-----------
 def feature2(id1, id2, biniter):
@@ -313,6 +275,7 @@ def feature4(id1, id2, biniter):
   yhisto1=histo1[1]
   zhisto1=histo1[2]
   
+  #xhisto2=histo2[0]
   xhisto2=reversing(histo2[0])
   yhisto2=histo2[1]
   zhisto2=histo2[2]
@@ -327,11 +290,11 @@ def feature4(id1, id2, biniter):
   z=[]
 
   for i in range(0, biniter):
-    xdiff = xhisto1[i]-xhisto2[i]
+    xdiff = sqrt((xhisto1[i]-xhisto2[i])**2)
     x.append(xdiff)
-    ydiff = yhisto1[i]-yhisto2[i]
+    ydiff = sqrt((yhisto1[i]-yhisto2[i])**2)
     y.append(ydiff)
-    zdiff = zhisto1[i]-zhisto2[i]
+    zdiff = sqrt((zhisto1[i]-zhisto2[i])**2)
     z.append(zdiff)
   histodiff = x + y + z
   return histodiff
@@ -356,19 +319,15 @@ def rawHistogramVector(id1, id2, biniter):
   trainingvector = xhisto1 + yhisto1 + zhisto1 + xhisto2 + yhisto2 + zhisto2
   return trainingvector
 
-  
-def featureSum(id1, id2, biniter):
-  summation = 0
-  featureV = featureVector(id1, id2, biniter)
-  for i in range(0, len(featureV)):
-    summation += int(featureV[i])
-  return summation
 
+#--------Features combined--------------------
 def featureVector(id1, id2, biniter):
   trainingvector = []
-  trainingvector =feature1(id1,id2, biniter) + feature2(id1, id2, biniter) + feature3(id1, id2, biniter)
+  trainingvector =feature1(id1,id2, biniter) + feature2(id1, id2, biniter) + feature3(id1, id2, biniter) + feature4(id1, id2, biniter)
   return trainingvector
 
+
+#-----------------sum of all features for a given pair-----------
 def featureMeasure(idpair, biniter):
   """ input a pair of 2 possible matches as follows: [id1, id2]. Return sum of featureVector"""
   trainingvector = featureVector(idpair[0], idpair[1], biniter)
@@ -377,6 +336,7 @@ def featureMeasure(idpair, biniter):
     sumMeasure+=s
   return sumMeasure
 
+#------------raw Data------------------------
 def rawFeatureVector(id1, id2, biniter):
   histo1=getDendriticProfiles(id1, biniter)
   xhisto1=histo1[0]
@@ -388,7 +348,8 @@ def rawFeatureVector(id1, id2, biniter):
   yhisto2=histo2[1]
   zhisto2=histo2[2]
 
-  #Calculation of sum of distances in bin is now included in getDendriticProfiles function to reduce runtime
+  #Calculation of sum of distances in bin is now included in 
+  #getDendriticProfiles function to reduce runtime
   xsumDist1 = histo1[3]
   ysumDist1 = histo1[4]
   zsumDist1 = histo1[5]
@@ -398,9 +359,10 @@ def rawFeatureVector(id1, id2, biniter):
   zsumDist2 = histo2[5]
     
   rawVector = []
-  rawVector = xhisto1 + xhisto2 + yhisto1 + yhisto2 + zhisto1 + zhisto2 + feature4(id1, id2, biniter) + feature1(id1, id2, biniter) +feature3(id1, id2, biniter) + feature2(id1, id2, biniter)
+  rawVector = xhisto1 + xhisto2 + yhisto1 + yhisto2 + zhisto1 + zhisto2 + xsumDist1 +xsumDist2 + ysumDist1 + ysumDist2 + zsumDist1 + zsumDist2 
   return rawVector
-
+   
+#---------------Combinatin of PCA and Scholl-like vector------------
 def pcaSphereVector(id1, id2, biniter):
   sphere1 = sphereCount(id1, biniter)
   sphere2 = sphereCount(id2, biniter)
@@ -419,7 +381,7 @@ def pcaSphereVector(id1, id2, biniter):
   
 
   trainingvector=[]
-  trainingvector = sphere1[0] + sphere2[0] + pca1 + pca2 +feature4(id1, id2, biniter) 
+  trainingvector = sphere1[0] + sphere2[0] + pca1 + pca2 #+feature4(id1, id2, biniter) 
 
   return trainingvector
 

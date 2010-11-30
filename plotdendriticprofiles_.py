@@ -16,8 +16,9 @@ from profilingFixedCoordinates import getNodeCoordinates
 #  wrongIDs1=[90155, 90168, 77161, 76052, 70195, 89088, 99495, 77829, 81321, 89147, 83589, 87617, 98723]
 #  wrongIDs2=[90161, 90165, 77155, 82591, 83068, 89094, 79187, 79740, 81032, 89245, 85171, 90045, 98916]
 
-ID=75408
+ID=75616
 tree = Display.getFront().getLayerSet().findById(ID)
+#print feature4(73337, 75616, 55)
 
 coords = Matrix(getNodeCoordinates(tree))
 

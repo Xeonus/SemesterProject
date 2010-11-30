@@ -2,9 +2,12 @@ from ini.trakem2.display import Display, Connector
 from jarray import array
 from java.awt.geom import Area
 from java.awt import Rectangle
- 
-# Obtain the currently defined treeline or areatree:
-ID=99481
+import sys
+sys.path.append("/Users/berthola/Desktop/Fiji Scripts")
+from dendriticprofiling import getNodeCoordinates
+#Obtain all downstream partners of the defined tree 
+
+ID=75408
 tree = tree = Display.getFront().getLayerSet().findById(ID)
 affine = tree.getAffineTransform()
 layerset = tree.getLayerSet()
@@ -48,19 +51,17 @@ for i in range(0, len(targetcontainer)):
     ID=(targetcontainer[i].toArray()[0]).getId()
     IDs.append(int(ID))
 
-"""
-singleIDs=[]
-singleIDs.append(IDs[0])
-for j in range(1, len(IDs)):
-  for i in range(0, len(singleIDs)):
-    if singleIDs[i] == IDs[j]:
-      singleIDs.append(IDs[j])
-    else:
-      continue
-
-print singleIDs
-"""
+#Get rid of duplicates and sort the list
 ordered=list(set(IDs))
-print ordered
-print len(ordered)
+
+#filter out small fragments <=500 nodes
+filtered=[]
+for ID in ordered:
+  tree = Display.getFront().getLayerSet().findById(ID)
+  if len(getNodeCoordinates(tree)) >= 500:
+    filtered.append(ID)
+  else:
+    continue
+    
+print filtered
  

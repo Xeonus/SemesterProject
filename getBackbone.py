@@ -139,10 +139,12 @@ Returns {average distance, cummulative distance, stdDev, median, prop_mut} which
 def compareVectorStrings(vs1, vs2, resample):
   vs1 = asVectorString(vs1)
   vs2 = asVectorStringMirror(vs2) #if asVectorStringMirror: has to be from other side
+  print vs1.length(), vs2.length()
+  
   e = Editions(vs1, vs2, resample, False, 1.1, 1.1, 1.1)
   return e.getStatistics(False, 0, 0, False)
 
-print compareVectorStrings(71887, 75408, 1)
+#print compareVectorStrings(71887, 75408, 1)
 
 
 

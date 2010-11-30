@@ -169,8 +169,3 @@ def getDendriticProfiles(ID, biniter):
     zhistovector[i]/=float(zlength)
     
   return xhistovector , yhistovector, zhistovector, xdist, ydist, zdist
-
-
-
-
-
