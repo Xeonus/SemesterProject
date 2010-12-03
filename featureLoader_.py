@@ -131,4 +131,4 @@ def rawFeaturetrainer(numtree, biniter):
   
   return outofbag #, classifier
 
-#print rawFeaturetrainer(500, 100)
+#print rawFeaturetrainer(500, 50)

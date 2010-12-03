@@ -131,9 +131,9 @@ def reversing(array):
   return reverse
 
 #Correct version of feature 1: compute sum of distances in a bin
-def feature1(id1, id2, biniter):
-  diff1=getDendriticProfiles(id1, biniter)
-  diff2=getDendriticProfiles(id2, biniter)
+def feature1(histo1, histo2, biniter):
+  diff1=histo1
+  diff2=histo2
   """
   tree1 = Display.getFront().getLayerSet().findById(id1)
   coords1 = Matrix(getNodeCoordinates(tree1))
@@ -175,10 +175,10 @@ def feature1(id1, id2, biniter):
 
  
 #----------Compute second feature -> Sum of Euclidean distances bincount-----------
-def feature2(id1, id2, biniter):
+def feature2(histo1, histo2, biniter):
 
-  histo1=getDendriticProfiles(id1, biniter)
-  histo2=getDendriticProfiles(id2, biniter)
+  #histo1=getDendriticProfiles(id1, biniter)
+  #histo2=getDendriticProfiles(id2, biniter)
   xhisto1=histo1[0]
   yhisto1=histo1[1]
   zhisto1=histo1[2]
@@ -204,8 +204,8 @@ def feature2(id1, id2, biniter):
 
 
 #---------Compute third feature -> Standart deviation of node-count histogram----
-def stdev(id1, biniter):
-  histo1=getDendriticProfiles(id1, biniter)
+def stdev(histo1, biniter):
+  #histo1=getDendriticProfiles(id1, biniter)
   xhisto=histo1[0]
   yhisto=histo1[1]
   zhisto=histo1[2]
@@ -240,12 +240,13 @@ def stdev(id1, biniter):
 
   return standard
 
+
 #------Compute Standartdeviation sum diff of histograms------------
 
-def feature3(id1, id2, biniter):
+def feature3(histo1, histo2, biniter):
 
-  histo1=stdev(id1, biniter)
-  histo2=stdev(id2, biniter)
+  histo1=stdev(histo1, biniter)
+  histo2=stdev(histo2, biniter)
   xhisto1=histo1[0]
   yhisto1=histo1[1]
   zhisto1=histo1[2]
@@ -265,9 +266,9 @@ def feature3(id1, id2, biniter):
 
 #----Compute a simple difference of both histograms
 
-def feature4(id1, id2, biniter):
-  histo1=getDendriticProfiles(id1, biniter)
-  histo2=getDendriticProfiles(id2, biniter)
+def feature4(histo1, histo2, biniter):
+  #isto1=getDendriticProfiles(id1, biniter)
+  #histo2=getDendriticProfiles(id2, biniter)
 
   xhisto1=histo1[0]
   yhisto1=histo1[1]
@@ -320,14 +321,23 @@ def rawHistogramVector(id1, id2, biniter):
 
 
 #--------Features combined--------------------
+#Save all the histograms in iddict to increase overall performance
+iddict={}
+#---------------------------------------------
 def featureVector(id1, id2, biniter):
-  histo1 = getDendriticProfiles(id1, biniter)
-  histo2 = getDendriticProfiles(id2, biniter)
-  trainingvector = []
-  trainingvector =feature1(id1,id2, biniter) + feature2(id1, id2, biniter) + feature3(id1, id2, biniter) #+ feature4(id1, id2, biniter)
+  if not id1 in iddict:
+    iddict[id1]=getDendriticProfiles(id1, biniter)
+  if not id2 in iddict:
+    iddict[id2]=getDendriticProfiles(id2, biniter)
+
+  histo1=iddict[id1]
+  histo2=iddict[id2]
+  trainingvector =feature1(histo1,histo2, biniter) + feature2(histo1, histo2, biniter) + feature3(histo1, histo2, biniter) + feature4(histo1, histo2, biniter)
+
   return trainingvector
 
 
+#print featureVector(72481, 99481, 50)
 
 #-----------------sum of all features for a given pair-----------
 def featureMeasure(idpair, biniter):
@@ -339,13 +349,17 @@ def featureMeasure(idpair, biniter):
   return sumMeasure
 
 #------------raw Data------------------------
-def rawFeatureVector(id1, id2, biniter):
-  histo1=getDendriticProfiles(id1, biniter)
+def rawFeatureVector(id2, id1, biniter):
+  if not id1 in iddict:
+    iddict[id1]=getDendriticProfiles(id1, biniter)
+  if not id2 in iddict:
+    iddict[id2]=getDendriticProfiles(id2, biniter)
+  
+  histo1=iddict[id1]
+  histo2=iddict[id2]
   xhisto1=histo1[0]
   yhisto1=histo1[1]
   zhisto1=histo1[2]
-  
-  histo2=getDendriticProfiles(id1, biniter)
   xhisto2=histo2[0]
   yhisto2=histo2[1]
   zhisto2=histo2[2]
@@ -355,16 +369,12 @@ def rawFeatureVector(id1, id2, biniter):
   xsumDist1 = histo1[3]
   ysumDist1 = histo1[4]
   zsumDist1 = histo1[5]
-
   xsumDist2 = histo2[3]
   ysumDist2 = histo2[4]
   zsumDist2 = histo2[5]
     
-  rawVector = []
-  rawVector =  xsumDist1 +xsumDist2 + ysumDist1 + ysumDist2 + zsumDist1 + zsumDist2 
+  rawVector =  xhisto1 + xhisto2 + yhisto1 + yhisto2 + zhisto1 + zhisto2 + xsumDist1 +xsumDist2 + ysumDist1 + ysumDist2 + zsumDist1 + zsumDist2 
   return rawVector
-
-  #xhisto1 + xhisto2 + yhisto1 + yhisto2 + zhisto1 + zhisto2 +
    
 #---------------Combinatin of PCA and Scholl-like vector------------
 def pcaSphereVector(id1, id2, biniter):
@@ -400,11 +410,11 @@ from weka.classifiers import AbstractClassifier
 from hr.irb.fastRandomForest import FastRandomForest
 
 
-def createClassifier(numTrees, numFeatures):
+def createClassifier(numTrees, numFeatures, seeds):
   rf = FastRandomForest()
   rf.setNumTrees(numTrees)
   rf.setNumFeatures(numFeatures)
-  rf.setSeed(12) #initially 123
+  rf.setSeed(seeds) #initially 123
   return rf
 
 def createAttributes(featureVector):
@@ -453,7 +463,6 @@ def classify(classifier, matches):
   attributes = createAttributes(matches[0])
   instances = Instances("tests", attributes, 1)
   instances.setClassIndex(len(attributes) -1)
-  #results = []
   distribution=[] ###
   for match in matches:
     instances.add(DenseInstance(1.0, match + [0]))
@@ -461,7 +470,6 @@ def classify(classifier, matches):
     result=classifier.classifyInstance(instances.instance(i))
     dist=(classifier.distributionForInstance(instances.instance(i)))
     results=[result, dist[1]]
-    #results.append(resultDist)
   return results
 
 
