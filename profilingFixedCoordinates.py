@@ -83,7 +83,6 @@ def getDendriticProfiles(ID, biniter):
     dpz.append(zstore.getRow(0))
 
   #Count number of nodes which fall in defined interval of pca projection
-  counter = 0
   xhistovector = []
   yhistovector = []
   zhistovector = []
@@ -112,22 +111,21 @@ def getDendriticProfiles(ID, biniter):
   xaxis=[]
 
   #Count lengths in bins
-  xdiff=0
-  ydiff=0
-  zdiff=0
   xdist=[]
   ydist=[]
   zdist=[]
 
   for i in range(0,iterations):
+    counter=0
+    xdiff=0
     for i in range(0, len(dpx)):
       if dpx[i] <= xbinright and dpx[i] >= xbinleft:
         counter += 1
-        xdiff += sqrt(dpy[i]**2) #xdist is yvalue
+        xdiff += sqrt(dpy[i]**2 + dpz[i]**2) #sqrt(dpy[i]**2) xdist is yvalue
+    if counter !=  0:
+      xdiff /= counter
     xdist.append(xdiff)        
     xhistovector.append(counter)
-    counter=0
-    xdiff=0
     xaxis.append(xbinleft)
     xbinleft += xlength
     xbinright += xlength
@@ -135,14 +133,16 @@ def getDendriticProfiles(ID, biniter):
   yaxis=[]
 
   for i in range(0,iterations):
+    counter=0
+    ydiff = 0
     for i in range(0, len(dpy)):
       if dpy[i] <= ybinright and dpy[i] >= ybinleft:
         counter += 1    
-        ydiff += sqrt(dpx[i]**2)
+        ydiff += sqrt(dpx[i]**2 + dpz[i]**2)
+    if counter !=  0:        
+      ydiff /= counter    
     ydist.append(ydiff)
     yhistovector.append(counter)
-    counter=0
-    ydiff = 0
     yaxis.append(ybinleft)
     ybinleft += ylength
     ybinright += ylength
@@ -150,22 +150,30 @@ def getDendriticProfiles(ID, biniter):
   zaxis=[]
 
   for i in range(0,iterations):
+    counter=0
+    zdiff=0
     for i in range(0, len(dpz)):
       if dpz[i] <= zbinright and dpz[i] >= zbinleft:
         counter += 1    
-        zdiff = sqrt(dpx[i]**2 + dpy[i]**2)
+        zdiff += sqrt(dpx[i]**2 + dpy[i]**2)
+    if counter !=  0:    
+      zdiff /= counter
     zdist.append(zdiff)
     zhistovector.append(counter)
-    counter=0
-    zdiff=0
     zaxis.append(zbinleft)
     zbinleft += zlength
     zbinright += zlength
 
+  #print xdist
+  #print ydist
+  #print zdist
+ 
+  
+  """
     #Normalize
   for i in range(0, iterations):
     xhistovector[i]/=float(xlength)
     yhistovector[i]/=float(ylength)
     zhistovector[i]/=float(zlength)
-    
+  """    
   return xhistovector , yhistovector, zhistovector, xdist, ydist, zdist

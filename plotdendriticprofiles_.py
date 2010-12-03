@@ -16,9 +16,10 @@ from profilingFixedCoordinates import getNodeCoordinates
 #  wrongIDs1=[90155, 90168, 77161, 76052, 70195, 89088, 99495, 77829, 81321, 89147, 83589, 87617, 98723]
 #  wrongIDs2=[90161, 90165, 77155, 82591, 83068, 89094, 79187, 79740, 81032, 89245, 85171, 90045, 98916]
 
-ID=75616
+ID=99481
 tree = Display.getFront().getLayerSet().findById(ID)
-#print feature4(73337, 75616, 55)
+#83160, 99481]
+#[72481, 99481]
 
 coords = Matrix(getNodeCoordinates(tree))
 
@@ -101,11 +102,12 @@ for i in range(0,iterations):
   zbinleft += zlength
   zbinright += zlength
   zaxis.append(zbinleft)
-
+"""
 for i in range(0, iterations):
   xhistovector[i]/=float(xlength)
   yhistovector[i]/=float(ylength)
   zhistovector[i]/=float(zlength)
+"""
 """  
 #Normalize vector
 for i in range(0, len(yhistovector)):
@@ -125,16 +127,19 @@ for i in range(0, len(zhistovector)):
 #Plot absolute coordinates versus node-count in a histogram
 
 plot = Plot("histogram", "y-coordinates", "count",yaxis, yhistovector)
+plot.setLimits(-34600.0, 35600.0, 0, 500) 
 plot.show()
 fs=FileSaver(plot.getImagePlus())
 fs.saveAsPng(System.getProperty("user.home") + "/Desktop/Histotest/y" + str(ID) + ".png")
 
 plot = Plot("histogram", "z-coordinates", "count", zaxis, zhistovector)
+plot.setLimits(0, 35600.0, 0, 500) 
 plot.show()
 fs=FileSaver(plot.getImagePlus())
 fs.saveAsPng(System.getProperty("user.home") + "/Desktop/Histotest/z" + str(ID) + ".png")
 
 plot = Plot("histogram", "x-coordinates", "count", xaxis, xhistovector)
+plot.setLimits(-34600.0, 35600.0, 0, 500) 
 plot.show()
 fs=FileSaver(plot.getImagePlus())
 fs.saveAsPng(System.getProperty("user.home") + "/Desktop/Histotest/xleft" + str(ID) + ".png")
@@ -152,6 +157,7 @@ for i in range(0, len(xaxis)):
   xaxismirror.append(xaxis[i]*(-1))
 
 plot = Plot("histogram", "x-coordinates", "count", xaxismirror, xhistomirror)
+plot.setLimits(-34600.0, 35600.0, 0, 500)
 plot.show()
 fs=FileSaver(plot.getImagePlus())
 fs.saveAsPng(System.getProperty("user.home") + "/Desktop/Histotest/xright" + str(ID) + ".png")

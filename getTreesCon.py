@@ -7,7 +7,7 @@ sys.path.append("/Users/berthola/Desktop/Fiji Scripts")
 from dendriticprofiling import getNodeCoordinates
 #Obtain all downstream partners of the defined tree 
 
-ID=75408
+ID=77041
 tree = tree = Display.getFront().getLayerSet().findById(ID)
 affine = tree.getAffineTransform()
 layerset = tree.getLayerSet()

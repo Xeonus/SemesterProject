@@ -134,7 +134,7 @@ def reversing(array):
 def feature1(id1, id2, biniter):
   diff1=getDendriticProfiles(id1, biniter)
   diff2=getDendriticProfiles(id2, biniter)
-
+  """
   tree1 = Display.getFront().getLayerSet().findById(id1)
   coords1 = Matrix(getNodeCoordinates(tree1))
   m1=coords1.getRowDimension()
@@ -142,7 +142,7 @@ def feature1(id1, id2, biniter):
   tree2 = Display.getFront().getLayerSet().findById(id2)
   coords2 = Matrix(getNodeCoordinates(tree2))
   m2=coords2.getRowDimension()
-  
+  """
   xdiff1=diff1[3]
   ydiff1=diff1[4]
   zdiff1=diff1[5]
@@ -159,9 +159,9 @@ def feature1(id1, id2, biniter):
   euclidean=[]
 
   for i in range(0, len(xdiff1)): 
-      xdiff += sqrt((xdiff1[i]/m1-xdiff2[i]/m2)**2) #Normalize differences with number of nodes!
-      ydiff += sqrt((ydiff1[i]/m1-ydiff2[i]/m2)**2)
-      zdiff += sqrt((zdiff1[i]/m1-zdiff2[i]/m2)**2)
+      xdiff += abs(xdiff1[i]-xdiff2[i]) #Normalize differences with number of nodes! REMOVED
+      ydiff += abs(ydiff1[i]-ydiff2[i])
+      zdiff += abs(zdiff1[i]-zdiff2[i])
       
   """
   #NORMALIZE BY NUMBER OF NODES-----NEW-------
@@ -170,8 +170,8 @@ def feature1(id1, id2, biniter):
   zdiff=zdiff/m
   #--------------------------- 
   """  
-  euclidean=[xdiff, ydiff, zdiff]
-  return euclidean
+  summeandist=[xdiff, ydiff, zdiff]
+  return summeandist
 
  
 #----------Compute second feature -> Sum of Euclidean distances bincount-----------
@@ -198,9 +198,10 @@ def feature2(id1, id2, biniter):
       xdiff += (xhisto1[i]-xhisto2[i])**2
       ydiff += (yhisto1[i]-yhisto2[i])**2
       zdiff += (zhisto1[i]-zhisto2[i])**2
-  euclidean=[xdiff, ydiff, zdiff]
+  euclidean=[sqrt(xdiff), sqrt(ydiff), sqrt(zdiff)]
   
   return euclidean
+
 
 #---------Compute third feature -> Standart deviation of node-count histogram----
 def stdev(id1, biniter):
@@ -253,15 +254,12 @@ def feature3(id1, id2, biniter):
   yhisto2=histo2[1]
   zhisto2=histo2[2]
   
-  xdiff=0
-  ydiff=0
-  zdiff=0
   euclidean=[]
   
-  xdiff += (xhisto1-xhisto2)**2
-  ydiff += (yhisto1-yhisto2)**2
-  zdiff += (zhisto1-zhisto2)**2
-  euclidean=[xdiff, ydiff, zdiff]
+  xdiff = (xhisto1-xhisto2)**2
+  ydiff = (yhisto1-yhisto2)**2
+  zdiff = (zhisto1-zhisto2)**2
+  euclidean=[sqrt(xdiff), sqrt(ydiff), sqrt(zdiff)]
   
   return euclidean
 
@@ -290,14 +288,15 @@ def feature4(id1, id2, biniter):
   z=[]
 
   for i in range(0, biniter):
-    xdiff = sqrt((xhisto1[i]-xhisto2[i])**2)
+    xdiff = abs(xhisto1[i]-xhisto2[i])
     x.append(xdiff)
-    ydiff = sqrt((yhisto1[i]-yhisto2[i])**2)
+    ydiff = abs(yhisto1[i]-yhisto2[i])
     y.append(ydiff)
-    zdiff = sqrt((zhisto1[i]-zhisto2[i])**2)
+    zdiff = abs(zhisto1[i]-zhisto2[i])
     z.append(zdiff)
   histodiff = x + y + z
   return histodiff
+
 
     
 #-------Input the raw HistogramVector as training Vector
@@ -322,9 +321,12 @@ def rawHistogramVector(id1, id2, biniter):
 
 #--------Features combined--------------------
 def featureVector(id1, id2, biniter):
+  histo1 = getDendriticProfiles(id1, biniter)
+  histo2 = getDendriticProfiles(id2, biniter)
   trainingvector = []
-  trainingvector =feature1(id1,id2, biniter) + feature2(id1, id2, biniter) + feature3(id1, id2, biniter) + feature4(id1, id2, biniter)
+  trainingvector =feature1(id1,id2, biniter) + feature2(id1, id2, biniter) + feature3(id1, id2, biniter) #+ feature4(id1, id2, biniter)
   return trainingvector
+
 
 
 #-----------------sum of all features for a given pair-----------
@@ -359,8 +361,10 @@ def rawFeatureVector(id1, id2, biniter):
   zsumDist2 = histo2[5]
     
   rawVector = []
-  rawVector = xhisto1 + xhisto2 + yhisto1 + yhisto2 + zhisto1 + zhisto2 + xsumDist1 +xsumDist2 + ysumDist1 + ysumDist2 + zsumDist1 + zsumDist2 
+  rawVector =  xsumDist1 +xsumDist2 + ysumDist1 + ysumDist2 + zsumDist1 + zsumDist2 
   return rawVector
+
+  #xhisto1 + xhisto2 + yhisto1 + yhisto2 + zhisto1 + zhisto2 +
    
 #---------------Combinatin of PCA and Scholl-like vector------------
 def pcaSphereVector(id1, id2, biniter):
@@ -400,7 +404,7 @@ def createClassifier(numTrees, numFeatures):
   rf = FastRandomForest()
   rf.setNumTrees(numTrees)
   rf.setNumFeatures(numFeatures)
-  rf.setSeed(123) #initially 123
+  rf.setSeed(12) #initially 123
   return rf
 
 def createAttributes(featureVector):
@@ -445,15 +449,23 @@ def trainClassifier(classifier, matchingExamples, mismatchingExamples):
 
 def classify(classifier, matches):
   """ Expects one vector numFeatures length """
+  """ returns a list of [result, distributionforinstance match]"""
   attributes = createAttributes(matches[0])
   instances = Instances("tests", attributes, 1)
   instances.setClassIndex(len(attributes) -1)
-  results = []
+  #results = []
+  distribution=[] ###
   for match in matches:
     instances.add(DenseInstance(1.0, match + [0]))
   for i in range(len(matches)):
-    results.append(classifier.classifyInstance(instances.instance(i)))
+    result=classifier.classifyInstance(instances.instance(i))
+    dist=(classifier.distributionForInstance(instances.instance(i)))
+    results=[result, dist[1]]
+    #results.append(resultDist)
   return results
+
+
+  
 
 
   
