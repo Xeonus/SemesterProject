@@ -8,18 +8,21 @@ from ij.io import FileSaver
 from machine_ import featureMeasure
 
 #plot the sum of featureVector of pairs found by the random forest algorithm
-matches=[]
+
 
 def measure(matchArray, biniter):
   matchlist = matchArray
   sumList=[]
   for pair in matchlist:
     sumMatches = featureMeasure(pair, biniter)
-    print sumMatches
+    #print sumMatches
     sumList.append(sumMatches)
   return sumList
-
-
+"""
+match= []
+test = measure(match, 30)
+print test
+"""
 
 for i in range(0, len(test)):
   if test[i] == min(test):
@@ -31,5 +34,6 @@ for i in range(0, len(test)):
   xaxis.append(i)
 
 
-plot = Plot("pair position in list", "similarity factor", "position", xaxis, test)
+plot = Plot("pair vs similarity factor", "pair", "similarity factor", xaxis, test)
 plot.show()
+

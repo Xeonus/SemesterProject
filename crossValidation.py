@@ -22,13 +22,15 @@ wrongIDs1=[77161, 76052, 70195, 89088, 99495, 77829, 81321, 89147, 83589, 87617,
 wrongIDs2=[77155, 82591, 83068, 89094, 79187, 79740, 81032, 89245, 85171, 90045, 98916, 96536, 89060, 74329, 96733, 83070, 78763, 82897, 73230]
 #------------------------------------
 """
-treeIDsleft=[73337, 73698, 73230, 74504, 72481, 72295, 71887, 73544, 73675, 72743, 74329, 74434, 79954, 74504]
-treeIDsright=[75616, 75783, 76408, 76825, 99481, 74877, 75408, 75949, 76718, 75854, 77041, 76923, 92479, 76825]
-wrongIDs1=[77161, 76052, 70195, 89088, 99495, 77829, 81321, 89147, 83589, 87617, 98723, 99083, 88107, 94359]
-wrongIDs2=[77155, 82591, 83068, 89094, 79187, 79740, 81032, 89245, 85171, 90045, 98916, 96536, 89060, 96733]
+treeIDsleft=[73337, 73698, 73230, 74504, 72481, 72295, 71887, 73544, 73675, 72743, 74329, 74434, 79954]
+treeIDsright=[75616, 75783, 76408, 76825, 105203, 74877, 75408, 75949, 76718, 75854, 77041, 76923, 92479]
+wrongIDs1=[77161, 76052, 70195, 89088, 77829, 81321, 89147, 83589, 88107, 94359, 98723, 99045, 99118]
+wrongIDs2=[77155, 82591, 83068, 89094, 79740, 81032, 89245, 85171, 89060, 96733, 101155, 87617, 77177]
 
 
-def kfold(mleft, mright, nmleft, nmright, numtree, biniter):
+
+
+def kfold(mleft, mright, nmleft, nmright, numtree, biniter, seed):
   """ 
   Defines a kfold cross-validation method where T is the dataset 
   to train the RandomForest algorithm and k is a subelement of T which 
@@ -79,12 +81,12 @@ def kfold(mleft, mright, nmleft, nmright, numtree, biniter):
     nonmatching = featureList(nonmatchlistleft, nonmatchlistright, biniter)  
     numTrees = numtree
     numFeatures = len(matching.values()[0])
-    classifier = createClassifier(numTrees, numFeatures + 1) # +1 to include the class
+    classifier = createClassifier(numTrees, numFeatures + 1, seed) # +1 to include the class
     outofbag = trainClassifier(classifier, matching.values(), nonmatching.values())
     oob+=float(outofbag)
     print "oob =", outofbag
-    print "kth element of matches tested against training set:", classify(classifier, [featureList([kmatch[0]], [kmatch[1]], biniter).values()[0]])
-    print "kth element of nonmatches tested against training set:", classify(classifier, [featureList([knonmatch[0]], [knonmatch[1]], biniter).values()[0]])
+    print "match vs raining set:", classify(classifier, [featureList([kmatch[0]], [kmatch[1]], biniter).values()[0]])
+    print "nonmatch vs training set:", classify(classifier, [featureList([knonmatch[0]], [knonmatch[1]], biniter).values()[0]])
     matchresult.append(classify(classifier, [featureList([kmatch[0]], [kmatch[1]], biniter).values()[0]]))
     nonmatchresult.append(classify(classifier, [featureList([knonmatch[0]], [knonmatch[1]], biniter).values()[0]]))
 
@@ -102,4 +104,4 @@ def kfold(mleft, mright, nmleft, nmright, numtree, biniter):
   moob = oob / float(elements / 2)  
   return "The performance is:", performance, "and the mean oob is:", moob
 
-print kfold(treeIDsleft, treeIDsright, wrongIDs1, wrongIDs2, 500,  50)
+print kfold(treeIDsleft, treeIDsright, wrongIDs1, wrongIDs2, 500,  150, 123)

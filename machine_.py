@@ -304,8 +304,13 @@ def feature4(histo1, histo2, biniter):
 
 def rawHistogramVector(id1, id2, biniter):
 
-  histo1=getDendriticProfiles(id1, biniter)
-  histo2=getDendriticProfiles(id2, biniter)
+  if not id1 in iddict:
+    iddict[id1]=getDendriticProfiles(id1, biniter)
+  if not id2 in iddict:
+    iddict[id2]=getDendriticProfiles(id2, biniter)
+
+  histo1=iddict[id1]
+  histo2=iddict[id2]
   xhisto1=histo1[0]
   yhisto1=histo1[1]
   zhisto1=histo1[2]
@@ -322,6 +327,7 @@ def rawHistogramVector(id1, id2, biniter):
 
 #--------Features combined--------------------
 #Save all the histograms in iddict to increase overall performance
+global iddict
 iddict={}
 #---------------------------------------------
 def featureVector(id1, id2, biniter):
@@ -375,23 +381,35 @@ def rawFeatureVector(id2, id1, biniter):
     
   rawVector =  xhisto1 + xhisto2 + yhisto1 + yhisto2 + zhisto1 + zhisto2 + xsumDist1 +xsumDist2 + ysumDist1 + ysumDist2 + zsumDist1 + zsumDist2 
   return rawVector
-   
+
+
+#-------Special dictionary for sphereCount and PCA------------------
+pdict={}
+sdict={}   
 #---------------Combinatin of PCA and Scholl-like vector------------
 def pcaSphereVector(id1, id2, biniter):
-  sphere1 = sphereCount(id1, biniter)
-  sphere2 = sphereCount(id2, biniter)
+  if not id1 in (pdict and sdict):
+    pdict[id1]=pca(id1, biniter)
+    sdict[id1]=sphereCount(id1, biniter)
+  if not id2 in (pdict and sdict):
+    pdict[id2]=pca(id2, biniter)
+    sdict[id2]=sphereCount(id2, biniter)
+   
+
+  sphere1 = sdict[id1]
+  sphere2 = sdict[id2]
   s1 = sphere1[0]
   s2 = sphere2[0]
-  pca1 = pca(id1, biniter)
-  pca2 = reversing(pca(id2, biniter))
+  pca1 = pdict[id1]
+  pca2 = reversing(pdict[id2])
 
   pcadiff=[]
   spherediff=[]
-  for i in range(0, len(pca1)):
-    pdiff = sqrt((pca1[i] - pca2[i])**2)
-    pcadiff.append(pdiff)
-    sdiff = sqrt((s1[i] - s2[i])**2)
-    spherediff.append(sdiff)
+  #for i in range(0, len(pca1)):
+  #  pdiff = abs(pca1[i]) - abs(pca2[i])
+  #  pcadiff.append(pdiff)
+  #  sdiff = abs(s1[i]) - abs(s2[i])
+  #  spherediff.append(sdiff)
   
 
   trainingvector=[]
@@ -399,8 +417,6 @@ def pcaSphereVector(id1, id2, biniter):
 
   return trainingvector
 
-
-#print pcaSphereVector(72481, 99481, 10)
 
 
 #-----------------Machine Learning-------------------------------------------

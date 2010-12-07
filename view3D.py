@@ -22,7 +22,7 @@ def createMesh(treeID):
 
 def visualize():
   univ = Image3DUniverse(512, 512)
-  for ID in [99501, 99481]: #trees to be visualized
+  for ID in [71887, 105203]: #trees to be visualized
     mesh = createMesh(ID)
     c = univ.createContent(mesh, str(ID))
     univ.addContent(c)

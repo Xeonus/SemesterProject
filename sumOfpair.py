@@ -11,38 +11,36 @@ from machine_ import featureMeasure, feature2
 
 
 #lch5-1 left
-IDvector1=[83160, 81196, 81321, 99501, 85174, 99455, 83695, 99442, 93311, 
-81056, 83785, 99063, 89064, 83370, 89024, 98996, 80463, 80108, 83822, 81916, 
-99635, 89072, 82926, 82082, 83070, 79954, 83627, 83437, 81550, 83772, 72481, 
-89066, 70195, 99511, 82757, 99495, 80333, 71887, 98795]
+lch51l=[83160, 81321, 105311, 99501, 85174, 98494, 99455, 99442, 93311, 81056, 
+83785, 105166, 89064, 98996, 80463, 80108, 83822, 81916, 89072, 101157, 100823, 82926, 
+82082, 83070, 79954, 83627, 83437, 81550, 72481, 77167, 89066, 70195, 105193, 99511, 
+100714, 82757, 80333, 71887, 98795]
+
 #lch5-1 right
-IDvector2=[95421, 98268, 93662, 97669, 75408, 94943, 95674, 99490, 97790, 
-92479, 95788, 91612, 94264, 95812, 83695, 93311, 95190, 95056, 95668, 95151, 
-95424, 92485, 99481, 94859, 94364, 92799, 93195, 91609, 96114, 93048, 98238, 
-93883, 95887, 93582, 94359, 96513, 93400, 95246]
+lch51r=[95421, 75408, 94943, 95674, 99490, 92479, 91612, 99958, 95010, 93311, 
+99784, 99898, 100515, 95190, 105166, 95056, 95668, 95151, 95424, 92485, 92799, 94364, 
+98268, 93662, 97669, 99867, 97790, 100400, 95788, 94264, 94859, 100131, 100550, 93195, 
+96114, 91609, 93048, 98238, 99943, 100818, 100314, 105203, 100091, 99821, 95887, 93582, 
+97572, 94359, 100162, 96513, 95246, 99648]
 
 def sumOfpair(treesleft, treesright, biniter):
-  """ Outputs a list with all possible combinations of pairs of two sides"""
+  """ Outputs a list of the featurefactor of all possible combinations of pairs of two sides"""
   #pairlist={}
   pairlist=[]
   pairs=[]
   sumM=0
-  for id1 in IDvector1:
-    for id2 in IDvector2:
+  for id1 in treesleft:
+    for id2 in treesright:
       pair=[id1, id2]
-      measure=feature2(id1, id2, biniter)
-      for m in measure:
-        sumM +=m 
-      print sumM
-      pairlist.append(sumM)
+      measure=featureMeasure(pair,  biniter)
+      pairlist.append(measure)
       pairs.append(pair)
-      sumM=0
   print "The pairs are:", pairs
   print "The sum of pairs on same position in list are:", pairlist
 
 
 
-print sumOfpair(IDvector1, IDvector2, 170)
+print sumOfpair(lch51l, lch51r, 30)
 
 """
 test=
